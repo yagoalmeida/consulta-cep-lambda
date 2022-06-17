@@ -50,8 +50,8 @@ jobs:
       - name: Upload zip file artifact
         uses: actions/upload-artifact@v2
         with:
-          name: $file_name
-          path: $file_name_zip
+          name: ${file_name}
+          path: ${file_name_zip}
           
   continuous-development:
     runs-on: ubuntu-latest
