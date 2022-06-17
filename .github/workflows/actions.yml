@@ -73,8 +73,10 @@ jobs:
         with:
           name: $file_name
       - name: Upload to S3
-        run: aws s3 cp $file_name_zip s3://$bucket_name/${{ github.event.repository.full_name }}/$file_name_zip
+        run: |
+          aws s3 cp $file_name_zip s3://$bucket_name/${{ github.event.repository.full_name }}/$file_name_zip
 
       - name: Deploy new Lambda
-        run: aws lambda update-function-code --function-name $lambda_name --s3-bucket $bucket_name --s3-key ${{ github.event.repository.full_name }}/$file_name_zip
+        run: |
+          aws lambda update-function-code --function-name $lambda_name --s3-bucket $bucket_name --s3-key ${{ github.event.repository.full_name }}/$file_name_zip
 
