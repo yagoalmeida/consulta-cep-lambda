@@ -26,3 +26,17 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
+
+      - name: Create Zipfile archive of Dependencies
+        run: |
+          cd ./venv/lib/python3.10/site-packages
+          zip -r9 ../../../../api.zip .
+
+      - name: Add App to Zip file
+        run: cd ./app && zip -g ../api.zip -r .
+
+      - name: Upload zip file artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: api
+          path: api.zip
