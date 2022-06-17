@@ -2,8 +2,17 @@ name: lambda-deployment-with-github-action-test
 
 on: [ push ]
 
+env:
+  file_name: code-lambda
+  file_name_zip: ${{file_name}}.zip
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+  bucket_name: storage-code-lambda-dev
+  lambda_name: poc_lambda_iac
+
 jobs:
-  build:
+  continuous-integration:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,13 +42,37 @@ jobs:
 
       - name: Create Zipfile archive of Dependencies
         run: |
-          zip -r9 api.zip ./venv/lib/python3.10/site-packages
+          zip -r9 $file_name_zip ./venv/lib/python3.10/site-packages
 
       - name: Add App to Zip file
-        run: zip -g api.zip -r . -x '*.git*' -x '*.pytest*' -x '*tests*'
+        run: zip -g $file_name_zip -r . -x '*.git*' -x '*.pytest*' -x '*tests*'
 
       - name: Upload zip file artifact
         uses: actions/upload-artifact@v2
         with:
-          name: api
-          path: api.zip
+          name: $file_name
+          path: $file_name_zip
+  continuous-deployment:
+    runs-on: ubuntu-latest
+    needs: [ continuous-integration ]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+        role-duration-seconds: 1200
+        role-session-name: deploy-lambda
+      - name: Download Lambda code-lambda.zip
+        uses: actions/download-artifact@v2
+        with:
+          name: $file_name
+      - name: Upload to S3
+        run: aws s3 cp $file_name_zip s3://$bucket_name/${{ github.event.repository.full_name }}/$file_name_zip
+
+      - name: Deploy new Lambda
+        run: aws lambda update-function-code --function-name $lambda_name --s3-bucket $bucket_name --s3-key ${{ github.event.repository.full_name }}/$file_name_zip
+
