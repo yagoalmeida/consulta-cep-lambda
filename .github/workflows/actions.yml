@@ -33,11 +33,10 @@ jobs:
 
       - name: Create Zipfile archive of Dependencies
         run: |
-          cd ./venv/lib/python3.10/site-packages
-          zip -r9 ../../../../api.zip .
+          zip -r9 api.zip ./venv/lib/python3.10/site-packages
 
       - name: Add App to Zip file
-        run: zip -g ../api.zip -r .
+        run: zip -g api.zip -r .
 
       - name: Upload zip file artifact
         uses: actions/upload-artifact@v2
