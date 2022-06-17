@@ -53,11 +53,8 @@ jobs:
           name: $file_name
           path: $file_name_zip
           
-  continuous-deployment:
+  continuous-development:
     runs-on: ubuntu-latest
-    needs: [continuous-integration]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS Credentials
