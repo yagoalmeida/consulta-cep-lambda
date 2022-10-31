@@ -8,7 +8,7 @@ on:
   pull_request:
 jobs:
   ci_cd:
-    uses: "yagoalmeida/python_actions/.github/workflows/lambda-python-deployment.yaml@main"
+    uses: "yagoalmeida/lambda-python-deployment-with-github-action/.github/workflows/lambda-python-deployment.yaml@main"
     with:
       AWS_DEFAULT_REGION: "us-east-1"
       bucket_name: "storage-code-lambda-dev"
