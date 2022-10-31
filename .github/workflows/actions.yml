@@ -7,13 +7,12 @@ on:
       - '*'
   pull_request:
 jobs:
-  terraform:
-      permissions: write-all
-      uses: "yagoalmeida/python_actions/.github/workflows/lambda-python-deployment.yaml@main"
-      with:
-        AWS_DEFAULT_REGION: "us-east-1"
-        bucket_name: "storage-code-lambda-dev"
-        lambda_name: "poc_lambda_iac"
-      secrets:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  ci_cd:
+    uses: "yagoalmeida/python_actions/.github/workflows/lambda-python-deployment.yaml@main"
+    with:
+      AWS_DEFAULT_REGION: "us-east-1"
+      bucket_name: "storage-code-lambda-dev"
+      lambda_name: "poc_lambda_iac"
+    secrets:
+      aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
